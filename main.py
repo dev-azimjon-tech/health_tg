@@ -4,16 +4,23 @@ import telebot
 TOKEN = "7332690649:AAHO61UwFAYQqFvINOsLIq_ixlSSgulE17M"
 bot = telebot.TeleBot(TOKEN)
 
+
+bot.remove_webhook()
+print("Webhook removed.")
+
+# TODO: adding all types of illnesses!!!!
+
 @bot.message_handler(commands=['start'])
 def start_cmd(message):
     markup = types.ReplyKeyboardMarkup(row_width=2)
     btn1 = types.KeyboardButton("About this bot")
     btn2 = types.KeyboardButton("AI Chat")
-    btn3 = types.KeyboardButton("Ilnesses")
+    btn3 = types.KeyboardButton("Illnesses")
     btn4 = types.KeyboardButton("Drugs")
     markup.add(btn1, btn2, btn3, btn4)
     bot.send_message(
-        message.chat.id, "  ",
+        message.chat.id, "Hi! In this bot, you can describe your symptoms to an AI chat and receive possible solutions. "
+    "You can also explore both traditional and modern treatments for various illnesses.",
         reply_markup=markup
         )
     
@@ -31,4 +38,16 @@ def about_bot(message):
 def back_menu(message):
     start_cmd(message)
 
+
+@bot.message_handler(func=lambda message:message.text.lower() == "illnesses")
+def ilness(message):
+    markup_illness = types.ReplyKeyboardMarkup(row_width=2)
+    type_illness = types.KeyboardButton("Types of Illnesses")
+    popular_illnesses = types.KeyboardButton("Popular Illnesses")
+    menu_back = types.KeyboardButton("Back to Menu")
+    markup_illness.add(type_illness, popular_illnesses, menu_back)
+    bot.send_message(message.chat.id, "Choose an option: ", reply_markup=markup_illness)
+
+
+bot.remove_webhook()
 bot.infinity_polling()

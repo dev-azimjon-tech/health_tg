@@ -34,7 +34,7 @@ class Test_About(unittest.TestCase):
        
         args, kwargs = mock_about.call_args
         self.assertEqual(args[0], 20091)
-        self.assertNotIn(
+        self.assertIn(
             "This bot allows you to describe your symptoms, and the AI will provide helpful guidance and possible solutions",
             args[1]
         )
@@ -42,6 +42,22 @@ class Test_About(unittest.TestCase):
         
         self.assertIn('reply_markup', kwargs)
 
+class Test_Illnesses(unittest.TestCase):
 
+    @patch("main.bot.send_message")
+    def test_illneses(self, mock_illnes):
+        msg = MagicMock()
+        msg.chat.id = 90000
+        msg.text = "illnesses"
+
+        main.ilness(msg)
+
+        args, kwargs = mock_illnes.call_args
+        self.assertEqual(args[0], 90000)
+        self.assertIn("Choose an option: ", args[1])
+
+        self.assertIn("reply_markup", kwargs)
+
+        
 if __name__ == "__main__":
     unittest.main()
