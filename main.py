@@ -4,11 +4,26 @@ import telebot
 TOKEN = "7332690649:AAHO61UwFAYQqFvINOsLIq_ixlSSgulE17M"
 bot = telebot.TeleBot(TOKEN)
 
-
 bot.remove_webhook()
 print("Webhook removed.")
 
-# TODO: adding all types of illnesses!!!!
+# Types of illnesses:
+
+infectious = {"illnes_name":"Info"}
+
+
+deficiency = {"illnes_name":"Info"}
+
+
+heriditary = {"illnes_name":"Info"}
+
+
+evironmental = {"illnes_name":"Info"}
+
+chronic = {"illnes_name":"Info"}
+
+acute = {"illnes_name":"Info"}
+
 
 @bot.message_handler(commands=['start'])
 def start_cmd(message):
@@ -47,6 +62,8 @@ def ilness(message):
     menu_back = types.KeyboardButton("Back to Menu")
     markup_illness.add(type_illness, popular_illnesses, menu_back)
     bot.send_message(message.chat.id, "Choose an option: ", reply_markup=markup_illness)
+    
+
 
 
 bot.remove_webhook()
