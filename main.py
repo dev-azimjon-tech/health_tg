@@ -1,70 +1,135 @@
+import json
+import os
 from telebot import types
 import telebot
 
 TOKEN = "7332690649:AAHO61UwFAYQqFvINOsLIq_ixlSSgulE17M"
 bot = telebot.TeleBot(TOKEN)
 
-bot.remove_webhook()
-print("Webhook removed.")
+USERS_FILE = "users.json"
 
-# Types of illnesses:
-
-infectious = {"illnes_name":"Info"}
-
-
-deficiency = {"illnes_name":"Info"}
-
-
-heriditary = {"illnes_name":"Info"}
+illness_data = {
+    "infectious": {"illness_name": "Info"},
+    "deficiency": {"illness_name": "Info"},
+    "hereditary": {"illness_name": "Info"},
+    "environmental": {"illness_name": "Info"},
+    "chronic": {"illness_name": "Info"},
+    "acute": {"illness_name": "Info"}
+}
 
 
-evironmental = {"illnes_name":"Info"}
+if os.path.exists(USERS_FILE):
+    with open(USERS_FILE, "r") as f:
+        users = json.load(f)
+else:
+    users = {}
 
-chronic = {"illnes_name":"Info"}
 
-acute = {"illnes_name":"Info"}
+def save_users():
+    with open(USERS_FILE, "w") as f:
+        json.dump(users, f, indent=2)
+
+
+def is_authenticated(user_id):
+    return str(user_id) in users
 
 
 @bot.message_handler(commands=['start'])
-def start_cmd(message):
-    markup = types.ReplyKeyboardMarkup(row_width=2)
-    btn1 = types.KeyboardButton("About this bot")
-    btn2 = types.KeyboardButton("AI Chat")
-    btn3 = types.KeyboardButton("Illnesses")
-    btn4 = types.KeyboardButton("Drugs")
-    markup.add(btn1, btn2, btn3, btn4)
-    bot.send_message(
-        message.chat.id, "Hi! In this bot, you can describe your symptoms to an AI chat and receive possible solutions. "
-    "You can also explore both traditional and modern treatments for various illnesses.",
-        reply_markup=markup
-        )
-    
-@bot.message_handler(func=lambda message:message.text.lower() == "about this bot")
+def start(message):
+    user_id = str(message.from_user.id)
+    if is_authenticated(user_id):
+        main_menu(message)
+    else:
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup.add("Register", "Log In")
+        bot.send_message(message.chat.id, "Welcome! Please Register or Log In to use the bot.", reply_markup=markup)
+
+
+@bot.message_handler(func=lambda m: m.text.lower() == "register")
+def register(message):
+    user_id = str(message.from_user.id)
+    if user_id in users:
+        bot.send_message(message.chat.id, "You're already registered.")
+        main_menu(message)
+        return
+    msg = bot.send_message(message.chat.id, "Enter your name:")
+    bot.register_next_step_handler(msg, process_register_name)
+
+def process_register_name(message):
+    name = message.text.strip()
+    user_id = str(message.from_user.id)
+    users[user_id] = {"name": name}
+    save_users()
+    bot.send_message(message.chat.id, f"Thanks {name}, you are now registered!")
+    main_menu(message)
+
+
+@bot.message_handler(func=lambda m: m.text.lower() == "log in")
+def login(message):
+    user_id = str(message.from_user.id)
+    if is_authenticated(user_id):
+        bot.send_message(message.chat.id, "You're already logged in.")
+        main_menu(message)
+    else:
+        bot.send_message(message.chat.id, "You're not registered yet. Please register first.")
+
+
+def main_menu(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    markup.add("About this bot", "AI Chat", "Illnesses", "Drugs", "Log Out")
+    bot.send_message(message.chat.id, "Main Menu:", reply_markup=markup)
+
+@bot.message_handler(func=lambda m: m.text.lower() == "about this bot")
 def about_bot(message):
-    markup_about = types.ReplyKeyboardMarkup(row_width=1)
-    btn = types.KeyboardButton("Back to Menu")
-    markup_about.add(btn)
-    bot.send_message(
-        message.chat.id,
-          "This bot allows you to describe your symptoms, and the AI will provide helpful guidance and possible solutions based on your input. Additionally, you can access a library of information about both traditional remedies and modern medical treatments for different illnesses. The goal of this bot is to help you understand your health better, compare solutions, and discover safe, effective methods to feel better.",
-          reply_markup=markup_about
-        )
-@bot.message_handler(func=lambda message:message.text.lower() == "back to menu")
-def back_menu(message):
-    start_cmd(message)
+    bot.send_message(message.chat.id,
+        "This bot allows you to describe your symptoms to AI and get helpful suggestions. "
+        "It also provides info about different illnesses and treatments.")
 
 
-@bot.message_handler(func=lambda message:message.text.lower() == "illnesses")
-def ilness(message):
-    markup_illness = types.ReplyKeyboardMarkup(row_width=2)
-    type_illness = types.KeyboardButton("Types of Illnesses")
-    popular_illnesses = types.KeyboardButton("Popular Illnesses")
-    menu_back = types.KeyboardButton("Back to Menu")
-    markup_illness.add(type_illness, popular_illnesses, menu_back)
-    bot.send_message(message.chat.id, "Choose an option: ", reply_markup=markup_illness)
-    
+@bot.message_handler(func=lambda m: m.text.lower() == "illnesses")
+def illness_types(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    markup.add(*illness_data.keys(), "Back to Menu")
+    bot.send_message(message.chat.id, "Choose a type of illness:", reply_markup=markup)
+
+@bot.message_handler(func=lambda m: m.text.lower() in illness_data)
+def illness_info(message):
+    key = message.text.lower()
+    bot.send_message(message.chat.id, f"{key.capitalize()} illness: {illness_data[key]['illness_name']}")
 
 
+
+@bot.message_handler(func=lambda m: m.text.lower() == "drugs")
+def drugs(message):
+    bot.send_message(message.chat.id, "Drugs information coming soon...")
+
+@bot.message_handler(func=lambda m: m.text.lower() == "ai chat")
+def ai_chat(message):
+    bot.send_message(message.chat.id, "AI chat coming soon...")
+
+@bot.message_handler(func=lambda m: m.text.lower() == "back to menu")
+def back_to_menu(message):
+    main_menu(message)
+
+
+@bot.message_handler(func=lambda m: m.text.lower() == "log out")
+def logout(message):
+    user_id = str(message.from_user.id)
+    if user_id in users:
+        del users[user_id]
+        save_users()
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add("Register", "Log In")
+    bot.send_message(message.chat.id, "You've been logged out.", reply_markup=markup)
+
+
+@bot.message_handler(func=lambda m: True)
+def block_unauthorized(message):
+    if not is_authenticated(str(message.from_user.id)):
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup.add("Register", "Log In")
+        bot.send_message(message.chat.id, "Please Register or Log In to use the bot.", reply_markup=markup)
 
 bot.remove_webhook()
+print("Webhook removed.")
 bot.infinity_polling()
