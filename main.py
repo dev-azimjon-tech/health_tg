@@ -1,5 +1,8 @@
 from telebot import types
 import telebot
+import json
+import os
+
 
 TOKEN = "7332690649:AAHO61UwFAYQqFvINOsLIq_ixlSSgulE17M"
 bot = telebot.TeleBot(TOKEN)
@@ -7,41 +10,105 @@ bot = telebot.TeleBot(TOKEN)
 bot.remove_webhook()
 print("Webhook removed.")
 
+USERS_FILE = "user.json"
+
+
+if os.path.exists(USERS_FILE):
+    with open(USERS_FILE,"r") as f:
+        user = json.load(f)
+else:
+    users = {}
+
+def save_users():
+    with open(USERS_FILE, "w") as f:
+        json.dump(users, f, indent=2)
+
+def is_authenticated(user_id):
+    return str(user_id) in users
+
+
 # Types of illnesses:
+data_illness = {
+    "infectios":"",
+    "deficiency":"",
+    "heriditary":"",
+    "environmental":"",
+    "chronic":"",
+    "acute":""
+}
 
-infectious = {"illnes_name":"Info"}
-
-
-deficiency = {"illnes_name":"Info"}
-
-
-heriditary = {"illnes_name":"Info"}
-
-
-evironmental = {"illnes_name":"Info"}
-
-chronic = {"illnes_name":"Info"}
-
-acute = {"illnes_name":"Info"}
 
 
 @bot.message_handler(commands=['start'])
-def start_cmd(message):
-    markup = types.ReplyKeyboardMarkup(row_width=2)
-    btn1 = types.KeyboardButton("About this bot")
-    btn2 = types.KeyboardButton("AI Chat")
-    btn3 = types.KeyboardButton("Illnesses")
-    btn4 = types.KeyboardButton("Drugs")
-    markup.add(btn1, btn2, btn3, btn4)
-    bot.send_message(
-        message.chat.id, "Hi! In this bot, you can describe your symptoms to an AI chat and receive possible solutions. "
-    "You can also explore both traditional and modern treatments for various illnesses.",
-        reply_markup=markup
+def start(message):
+    user_id = str(message.from_user.id)
+    if is_authenticated(user_id):
+        main_menu(message)
+    else:
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        btn1 = types.KeyboardButton("Register")
+        btn2 = types.KeyboardButton("Log In")
+        markup.add(btn1,btn2)
+        bot.send_message(
+            message.chat.id,
+            "Hi! In this bot, you can describe your symptoms to an AI chat and receive possible solutions. "
+        "You can also explore both traditional and modern treatments for various illnesses.",
         )
-    
+        bot.send_message(message.chat.id, "Please Register or Log In to use the bot", reply_markup=markup)
+@bot.message_handler(func=lambda m: m.text.lower() == "register")
+def register(message):
+    user_id = str(message.from_user.id)
+    if user_id in users:
+        bot.send_message(message.chat.id, "You're already registered.")
+        main_menu(message)
+        return
+    msg = bot.send_message(message.chat.id, "Enter your name:")
+    bot.register_next_step_handler(msg, process_register_name)
+
+def process_register_name(message):
+    name = message.text.strip()
+    user_id = str(message.from_user.id)
+    users[user_id] = {"name": name}
+    msg = bot.send_message(message.chat.id, "Now enter your phone number:")
+    bot.register_next_step_handler(msg, process_register_phone)
+
+def process_register_phone(message):
+    phone = message.text.strip()
+    user_id = str(message.from_user.id)
+
+    if user_id in users:
+        users[user_id]["phone"] = phone
+        save_users()
+        bot.send_message(message.chat.id, f"Registration complete!\nName: {users[user_id]['name']}\nPhone: {phone}")
+        main_menu(message)
+    else:
+        bot.send_message(message.chat.id, "Something went wrong. Please type 'register' again.")
+
+
+@bot.message_handler(func=lambda message:message.text.lower() == "log in")
+def login(message):
+    user_id = str(message.from_user.id)
+    if is_authenticated(user_id):
+        bot.send_message(message.chat.id, "You have alredy logged in!")
+        main_menu(message)
+    else:
+        bot.send_message(message.chat.id, "You are bot registered yet. Please register first!")
+
+def main_menu(message):
+    markup_main = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+    button1 = types.KeyboardButton("About This Bot")
+    button2 = types.KeyboardButton("Symptom Checker")
+    button3 = types.KeyboardButton("Types of Illnesses")
+    button4 = types.KeyboardButton("Popular Illnesses")
+    button5 = types.KeyboardButton("Drugs")
+    log_out_btn = types.KeyboardButton("Log Out")
+    markup_main.add(button1, button2, button3, button4, button5, log_out_btn)
+    bot.send_message(message.chat.id, "Main Menu: ", reply_markup=markup_main)
+
+
 @bot.message_handler(func=lambda message:message.text.lower() == "about this bot")
 def about_bot(message):
-    markup_about = types.ReplyKeyboardMarkup(row_width=1)
+    markup_about = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     btn = types.KeyboardButton("Back to Menu")
     markup_about.add(btn)
     bot.send_message(
@@ -51,18 +118,8 @@ def about_bot(message):
         )
 @bot.message_handler(func=lambda message:message.text.lower() == "back to menu")
 def back_menu(message):
-    start_cmd(message)
+    main_menu(message)
 
-
-@bot.message_handler(func=lambda message:message.text.lower() == "illnesses")
-def ilness(message):
-    markup_illness = types.ReplyKeyboardMarkup(row_width=2)
-    type_illness = types.KeyboardButton("Types of Illnesses")
-    popular_illnesses = types.KeyboardButton("Popular Illnesses")
-    menu_back = types.KeyboardButton("Back to Menu")
-    markup_illness.add(type_illness, popular_illnesses, menu_back)
-    bot.send_message(message.chat.id, "Choose an option: ", reply_markup=markup_illness)
-    
 
 
 
