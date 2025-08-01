@@ -120,7 +120,9 @@ def about_bot(message):
 def back_menu(message):
     main_menu(message)
 
-
+@bot.message_handler(func=lambda message:message.text.lower() == "symptom checker")
+def symptom_checker(message):
+    bot.send_message(message.chat.id, "In procces........")
 
 
 bot.remove_webhook()
