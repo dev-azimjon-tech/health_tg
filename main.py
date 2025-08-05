@@ -156,6 +156,25 @@ def handle_messages(message):
     elif message.text.lower() == "back to menu":
         main_menu(message)
 
+        
+@bot.message_handler(func=lambda m: m.text.lower() == "log out")
+def logout(message):
+    user_id = str(message.from_user.id)
+    if user_id in users:
+        del users[user_id]
+        save_users()
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add("Register", "Log In")
+    bot.send_message(message.chat.id, "You've been logged out.", reply_markup=markup)
+
+
+@bot.message_handler(func=lambda m: True)
+def block_unauthorized(message):
+    if not is_authenticated(str(message.from_user.id)):
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup.add("Register", "Log In")
+        bot.send_message(message.chat.id, "Please Register or Log In to use the bot.", reply_markup=markup)
+
 
 bot.remove_webhook()
 bot.infinity_polling()
