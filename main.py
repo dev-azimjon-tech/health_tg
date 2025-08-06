@@ -138,6 +138,12 @@ def symptom_checker(message):
         reply_markup=markup
     )
 
+@bot.message_handler(func=lambda message:message.text.lower() == "types of illnesses")
+def types_illness(message):
+    markup_type = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    markup_type.add(*data_illness.keys(), "Back to Menu")
+    bot.send_message(message.chat.id, "Choose a type of illness:", reply_markup=markup_type)
+
 @bot.message_handler(func=lambda message: True)
 def handle_messages(message):
     user_id = str(message.from_user.id)
@@ -156,7 +162,11 @@ def handle_messages(message):
     elif message.text.lower() == "back to menu":
         main_menu(message)
 
-        
+
+
+
+
+
 @bot.message_handler(func=lambda m: m.text.lower() == "log out")
 def logout(message):
     user_id = str(message.from_user.id)
@@ -175,6 +185,8 @@ def block_unauthorized(message):
         markup.add("Register", "Log In")
         bot.send_message(message.chat.id, "Please Register or Log In to use the bot.", reply_markup=markup)
 
-
-bot.remove_webhook()
-bot.infinity_polling()
+if __name__ == "__main__":
+    print("Bot running....")
+    bot.remove_webhook()
+    print("Webhook removed!.")
+    bot.infinity_polling()
