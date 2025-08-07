@@ -2,62 +2,111 @@ import unittest
 from unittest.mock import MagicMock, patch
 import main
 
-class TestStart(unittest.TestCase):
 
-    @patch('main.bot.send_message')
-    def test_start(self, mock_message):
-        msg = MagicMock()
-        msg.chat.id = 1099
-        msg.text = '/start'
-
-        main.start_cmd(msg)
-
-        mock_message.assert_called()
-        args, kwargs = mock_message.call_args
-        self.assertEqual(args[0], 1099)
-        self.assertIn(
-            "Hi! In this bot, you can describe your symptoms to an AI chat and receive possible solutions. You can also explore both traditional and modern treatments for various illnesses.",
-            args[1]
-        )
-
-
-class Test_About(unittest.TestCase):
-
+class TestStartCommand(unittest.TestCase):
     @patch("main.bot.send_message")
-    def test_about(self, mock_about):
+    def test_start_for_new_user(self, mock_send_message):
         message = MagicMock()
-        message.chat.id = 20091
-        message.text = "about this bot"
+        message.chat.id = 1234
+        message.from_user.id = 1234
+        main.users = {}
+
+        main.start(message)
+
+
+        self.assertEqual(mock_send_message.call_count, 2)
+        welcome_text = mock_send_message.call_args_list[0][0][1]
+        self.assertIn("Hi! In this bot, you can describe your symptoms", welcome_text)
+
+
+class TestAboutCommand(unittest.TestCase):
+    @patch("main.bot.send_message")
+    def test_about(self, mock_send_message):
+        message = MagicMock()
+        message.chat.id = 4321
 
         main.about_bot(message)
 
-       
-        args, kwargs = mock_about.call_args
-        self.assertEqual(args[0], 20091)
-        self.assertIn(
-            "This bot allows you to describe your symptoms, and the AI will provide helpful guidance and possible solutions",
-            args[1]
-        )
-
-        
-        self.assertIn('reply_markup', kwargs)
-
-class Test_Illnesses(unittest.TestCase):
-
-    @patch("main.bot.send_message")
-    def test_illneses(self, mock_illnes):
-        msg = MagicMock()
-        msg.chat.id = 90000
-        msg.text = "illnesses"
-
-        main.ilness(msg)
-
-        args, kwargs = mock_illnes.call_args
-        self.assertEqual(args[0], 90000)
-        self.assertIn("Choose an option: ", args[1])
-
+        args, kwargs = mock_send_message.call_args
+        self.assertEqual(args[0], 4321)
+        self.assertIn("This bot allows you to describe your symptoms", args[1])
         self.assertIn("reply_markup", kwargs)
 
+
+class TestIllnessTypes(unittest.TestCase):
+    @patch("main.bot.send_message")
+    def test_types_illness(self, mock_send_message):
+        message = MagicMock()
+        message.chat.id = 5555
+
+        main.types_illness(message)
+
+        args, kwargs = mock_send_message.call_args
+        self.assertEqual(args[0], 5555)
+        self.assertIn("Choose a type of illness", args[1])
+        self.assertIn("reply_markup", kwargs)
+
+
+class TestInfoTypeIll(unittest.TestCase):
+    @patch("main.bot.send_message")
+    def test_info_type_ill(self, mock_send_message):
+        message = MagicMock()
+        message.chat.id = 6666
+        message.text = "infectious"
+
+        main.info_type_ill(message)
+
+        args, _ = mock_send_message.call_args
+        self.assertEqual(args[0], 6666)
+        self.assertIn("Infectious Illness Info:", args[1])
+
+
+class TestRegisterHandler(unittest.TestCase):
+    @patch("main.bot.send_message")
+    def test_register_new_user(self, mock_send_message):
+        message = MagicMock()
+        message.chat.id = 7777
+        message.from_user.id = 7777
+        main.users = {}
+
+        main.register(message)
+
+        self.assertTrue(mock_send_message.called)
+        args, _ = mock_send_message.call_args
+        self.assertEqual(args[0], 7777)
+        self.assertIn("Enter your name", args[1])
+
+
+class TestLoginHandler(unittest.TestCase):
+    @patch("main.bot.send_message")
+    def test_login_unregistered_user(self, mock_send_message):
+        message = MagicMock()
+        message.chat.id = 8888
+        message.from_user.id = 8888
+        main.users = {}
+
+        main.login(message)
+
+        args, _ = mock_send_message.call_args
+        self.assertEqual(args[0], 8888)
+        self.assertIn("register first", args[1])
+
+
+class TestLogoutHandler(unittest.TestCase):
+    @patch("main.bot.send_message")
+    def test_logout_user(self, mock_send_message):
+        message = MagicMock()
+        message.chat.id = 9999
+        message.from_user.id = 9999
+        main.users = {'9999': {'name': 'Test'}}
         
+        main.logout(message)
+
+        args, _ = mock_send_message.call_args
+        self.assertEqual(args[0], 9999)
+        self.assertIn("logged out", args[1])
+        self.assertNotIn('9999', main.users)
+
+
 if __name__ == "__main__":
     unittest.main()
