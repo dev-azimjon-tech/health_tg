@@ -166,7 +166,17 @@ def handle_messages(message):
         bot.send_message(message.chat.id, "Please Register or Log In to use the bot.", reply_markup=markup)
         return
 
-
+@bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "symptom checker")
+def symptom_checker(message):
+    user_id = str(message.from_user.id)
+    user_mode[user_id] = "symptom_checker"
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add(types.KeyboardButton("Back to Menu"))
+    bot.send_message(
+        message.chat.id,
+        "Symptom Checker Mode Activated.\nDescribe your symptoms, and I will provide possible causes and solutions.\nPress 'Back to Menu' anytime to exit.",
+        reply_markup=markup
+    )
     mode = user_mode.get(user_id, "menu")
     if mode == "symptom_checker" and message.text.strip().lower() != "back to menu":
         symptoms = message.text.strip()

@@ -107,6 +107,20 @@ class TestLogoutHandler(unittest.TestCase):
         self.assertIn("logged out", args[1])
         self.assertNotIn('9999', main.users)
 
+class TestSymptomChecker(unittest.TestCase):
+    @patch("main.bot.send_message")
+    def test_symptom_checker(self, mock_send_message):
+        message = MagicMock()
+        message.chat.id = 6
+        message.from_user.id = 6
+        message.text = "symptom checker"
+        main.user_mode = {}
+
+        main.symptom_checker(message)
+
+        args, _ = mock_send_message.call_args_list[0]
+        self.assertEqual(args[0], 6)
+        self.assertIn("Symptom Checker Mode Activated.", args[1])
 
 if __name__ == "__main__":
     unittest.main()
