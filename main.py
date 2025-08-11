@@ -14,6 +14,7 @@ genai.configure(api_key=API_KEY)
 bot = telebot.TeleBot(TOKEN)
 
 USERS_FILE = "user.json"
+DRUGS_FILE = "drugs.json"
 
 if os.path.exists(USERS_FILE):
     with open(USERS_FILE, "r") as f:
@@ -23,6 +24,7 @@ else:
 
 user_mode = {}
 
+
 def save_users():
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=2)
@@ -30,14 +32,25 @@ def save_users():
 def is_authenticated(user_id):
     return str(user_id) in users
 
-data_illness = {
-    "infectious": "Infectious illnesses are diseases that spread from person to person. They are caused by germs like viruses or bacteria and spread through coughs, touch, or dirty food/water. Washing hands, wearing masks, and vaccines help prevent them.",
-    "deficiency": "Deficiency illnesses happen when the body lacks essential nutrients like vitamins or minerals. Example: lack of vitamin C causes scurvy.",
-    "hereditary": "Hereditary illnesses are passed from parents to children through genes. Example: sickle cell anemia.",
-    "environmental": "Environmental illnesses are caused by harmful things around us, like air pollution, chemicals, or radiation. Example: asthma from dirty air.",
-    "chronic": "Chronic illnesses last a long time, often for life. They develop slowly. Example: diabetes or high blood pressure.",
-    "acute": "Acute illnesses come suddenly and last a short time. Example: flu or a cold."
-}
+def load_drugs():
+    with open(DRUGS_FILE, 'r') as f:
+        return json.load(f)
+
+
+def main_menu(message):
+    user_id = str(message.from_user.id)
+    user_mode[user_id] = "menu"
+    markup_main = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+    markup_main.add(
+        types.KeyboardButton("About This Bot"),
+        types.KeyboardButton("Symptom Checker"),
+        types.KeyboardButton("Types of Illnesses"),
+        types.KeyboardButton("Popular Illnesses"),
+        types.KeyboardButton("Drugs"),
+        types.KeyboardButton("Log Out")
+    )
+    bot.send_message(message.chat.id, "Main Menu:", reply_markup=markup_main)
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -49,8 +62,8 @@ def start(message):
         markup.add("Register", "Log In")
         bot.send_message(
             message.chat.id,
-            "Hi! In this bot, you can describe your symptoms to an AI chat and receive possible solutions. "
-            "You can also explore both traditional and modern treatments for various illnesses."
+            "Hi! This bot lets you describe your symptoms to AI for possible solutions, "
+            "and explore information about illnesses and drugs."
         )
         bot.send_message(message.chat.id, "Please Register or Log In to use the bot", reply_markup=markup)
 
@@ -91,20 +104,6 @@ def login(message):
     else:
         bot.send_message(message.chat.id, "You are not registered yet. Please register first!")
 
-def main_menu(message):
-    user_id = str(message.from_user.id)
-    user_mode[user_id] = "menu"
-    markup_main = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
-    markup_main.add(
-        types.KeyboardButton("About This Bot"),
-        types.KeyboardButton("Symptom Checker"),
-        types.KeyboardButton("Types of Illnesses"),
-        types.KeyboardButton("Popular Illnesses"),
-        types.KeyboardButton("Drugs"),
-        types.KeyboardButton("Log Out")
-    )
-    bot.send_message(message.chat.id, "Main Menu:", reply_markup=markup_main)
-
 @bot.message_handler(func=lambda m: m.text and m.text.strip().lower() == "log out")
 def logout(message):
     user_id = str(message.from_user.id)
@@ -116,21 +115,35 @@ def logout(message):
     markup.add("Register", "Log In")
     bot.send_message(message.chat.id, "You've been logged out.", reply_markup=markup)
 
+
 @bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "about this bot")
 def about_bot(message):
     markup_about = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     markup_about.add(types.KeyboardButton("Back to Menu"))
     bot.send_message(
         message.chat.id,
-        "This bot allows you to describe your symptoms, and the AI will provide helpful guidance and possible solutions "
-        "based on your input. Additionally, you can access a library of information about both traditional remedies and "
-        "modern medical treatments for different illnesses.",
+        "This bot lets you:\n"
+        "- Describe your symptoms to AI and get possible solutions.\n"
+        "- Explore illnesses and treatments.\n"
+        "- Search for drug information.",
         reply_markup=markup_about
     )
 
-@bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "back to menu")
-def back_menu(message):
-    main_menu(message)
+
+@bot.message_handler(func=lambda message: message.text.lower() == "drugs")
+def drugs_info(message):
+    user_id = str(message.from_user.id)
+    user_mode[user_id] = "drugs"
+
+    markup_drug = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+    markup_drug.add(types.KeyboardButton("Back to Menu"))
+
+    bot.send_message(
+        message.chat.id,
+        "Drug Search Mode Activated.\nEnter the drug name (exact or partial).\nPress 'Back to Menu' to exit.",
+        reply_markup=markup_drug
+    )
+
 
 @bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "symptom checker")
 def symptom_checker(message):
@@ -140,9 +153,19 @@ def symptom_checker(message):
     markup.add(types.KeyboardButton("Back to Menu"))
     bot.send_message(
         message.chat.id,
-        "Symptom Checker Mode Activated.\nDescribe your symptoms, and I will provide possible causes and solutions.\nPress 'Back to Menu' anytime to exit.",
+        "Symptom Checker Mode Activated.\nDescribe your symptoms.\nPress 'Back to Menu' to exit.",
         reply_markup=markup
     )
+
+
+data_illness = {
+    "infectious": "Infectious illnesses spread from person to person via germs.",
+    "deficiency": "Caused by lack of essential nutrients.",
+    "hereditary": "Passed from parents to children via genes.",
+    "environmental": "Caused by harmful environmental factors.",
+    "chronic": "Long-lasting illnesses.",
+    "acute": "Sudden and short-term illnesses."
+}
 
 @bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "types of illnesses")
 def types_illness(message):
@@ -155,6 +178,7 @@ def info_type_ill(message):
     key = message.text.strip().lower()
     bot.send_message(message.chat.id, f"{key.capitalize()} Illness Info: {data_illness[key]}")
 
+
 @bot.message_handler(func=lambda message: True)
 def handle_messages(message):
     user_id = str(message.from_user.id)
@@ -166,31 +190,51 @@ def handle_messages(message):
         bot.send_message(message.chat.id, "Please Register or Log In to use the bot.", reply_markup=markup)
         return
 
-@bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "symptom checker")
-def symptom_checker(message):
-    user_id = str(message.from_user.id)
-    user_mode[user_id] = "symptom_checker"
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(types.KeyboardButton("Back to Menu"))
-    bot.send_message(
-        message.chat.id,
-        "Symptom Checker Mode Activated.\nDescribe your symptoms, and I will provide possible causes and solutions.\nPress 'Back to Menu' anytime to exit.",
-        reply_markup=markup
-    )
+    text = message.text.strip().lower()
+
+
+    if text == "back to menu":
+        main_menu(message)
+        return
+
     mode = user_mode.get(user_id, "menu")
-    if mode == "symptom_checker" and message.text.strip().lower() != "back to menu":
-        symptoms = message.text.strip()
+
+
+    if mode == "drugs":
+        drugs = load_drugs()
+        found = False
+        for drug in drugs:
+            if drug["name"].lower() == text:
+                bot.send_message(
+                    message.chat.id,
+                    f"Name: {drug['name']}\n"
+                    f"Description: {drug.get('description', 'N/A')}\n"
+                    f"Dosage: {drug.get('dosage', 'N/A')}\n"
+                    f"Type: {drug.get('type', 'N/A')}"
+                )
+                found = True
+                break
+        if not found:
+            bot.send_message(message.chat.id, f"No drug like '{text}' found.")
+        return
+
+
+    if mode == "symptom_checker" and text != "back to menu":
         bot.send_message(message.chat.id, "Analyzing your symptoms... Please wait.")
         try:
             model = genai.GenerativeModel("gemini-2.5-flash")
-            response = model.generate_content(f"{symptoms}")
+            response = model.generate_content(message.text.strip())
             bot.send_message(message.chat.id, response.text)
         except Exception as e:
             bot.send_message(message.chat.id, f"AI error: {str(e)}")
-    elif message.text.strip().lower() == "back to menu":
-        main_menu(message)
+        return
 
 
+    if mode == "menu":
+        bot.send_message(message.chat.id, "Please choose an option from the menu.")
+        main_menu()
+        
+# ---------------- Run Bot ----------------
 if __name__ == "__main__":
     print("Bot running....")
     bot.remove_webhook()
