@@ -234,7 +234,7 @@ def handle_messages(message):
         bot.send_message(message.chat.id, "Please choose an option from the menu.")
         main_menu()
         
-# ---------------- Run Bot ----------------
+
 if __name__ == "__main__":
     print("Bot running....")
     bot.remove_webhook()

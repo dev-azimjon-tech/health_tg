@@ -1,296 +1,338 @@
 [
-    {
-        "name": "Paracetamol",
-        "description": "Pain reliever and fever reducer",
-        "dosage": "500mg every 4-6 hours",
-        "type": "Tablet"
-    },
-    {
-        "name": "Ibuprofen",
-        "description": "Anti-inflammatory and pain reliever",
-        "dosage": "200mg every 6-8 hours",
-        "type": "Tablet"
-    },
-    {
-        "name": "Amoxicillin",
-        "description": "Antibiotic for bacterial infections",
-        "dosage": "500mg every 8 hours",
-        "type": "Capsule"
-    },
-    {
-        "name": "Metformin",
-        "description": "Controls high blood sugar in type 2 diabetes",
-        "dosage": "500mg twice daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Aspirin",
-        "description": "Pain reliever, reduces inflammation and fever",
-        "dosage": "300mg every 4-6 hours",
-        "type": "Tablet"
-    },
-    {
-        "name": "Ciprofloxacin",
-        "description": "Antibiotic for bacterial infections",
-        "dosage": "500mg every 12 hours",
-        "type": "Tablet"
-    },
-    {
-        "name": "Omeprazole",
-        "description": "Reduces stomach acid",
-        "dosage": "20mg once daily",
-        "type": "Capsule"
-    },
-    {
-        "name": "Azithromycin",
-        "description": "Antibiotic for bacterial infections",
-        "dosage": "500mg on day 1, then 250mg daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Loratadine",
-        "description": "Relieves allergy symptoms",
-        "dosage": "10mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Cetirizine",
-        "description": "Relieves allergy symptoms",
-        "dosage": "10mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Hydrochlorothiazide",
-        "description": "Treats high blood pressure and fluid retention",
-        "dosage": "25mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Amlodipine",
-        "description": "Treats high blood pressure and chest pain",
-        "dosage": "5mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Losartan",
-        "description": "Treats high blood pressure",
-        "dosage": "50mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Atorvastatin",
-        "description": "Lowers cholesterol levels",
-        "dosage": "10mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Simvastatin",
-        "description": "Lowers cholesterol",
-        "dosage": "20mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Levothyroxine",
-        "description": "Treats hypothyroidism",
-        "dosage": "50mcg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Prednisone",
-        "description": "Reduces inflammation",
-        "dosage": "10mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Hydrocortisone Cream",
-        "description": "Relieves skin irritation and inflammation",
-        "dosage": "Apply thin layer 2-3 times daily",
-        "type": "Topical Cream"
-    },
-    {
-        "name": "Insulin Glargine",
-        "description": "Long-acting insulin for diabetes",
-        "dosage": "As prescribed, usually once daily",
-        "type": "Injection"
-    },
-    {
-        "name": "Insulin Aspart",
-        "description": "Rapid-acting insulin for diabetes",
-        "dosage": "As prescribed before meals",
-        "type": "Injection"
-    },
-    {
-        "name": "Salbutamol Inhaler",
-        "description": "Relieves asthma symptoms",
-        "dosage": "2 puffs every 4-6 hours as needed",
-        "type": "Inhaler"
-    },
-    {
-        "name": "Budesonide Inhaler",
-        "description": "Prevents asthma attacks",
-        "dosage": "1-2 inhalations twice daily",
-        "type": "Inhaler"
-    },
-    {
-        "name": "Montelukast",
-        "description": "Prevents asthma and allergy symptoms",
-        "dosage": "10mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Furosemide",
-        "description": "Diuretic for fluid retention",
-        "dosage": "40mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Spironolactone",
-        "description": "Treats high blood pressure and fluid buildup",
-        "dosage": "25mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Clopidogrel",
-        "description": "Prevents blood clots",
-        "dosage": "75mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Warfarin",
-        "description": "Prevents blood clots",
-        "dosage": "As prescribed based on INR",
-        "type": "Tablet"
-    },
-    {
-        "name": "Enoxaparin",
-        "description": "Prevents and treats blood clots",
-        "dosage": "40mg once daily",
-        "type": "Injection"
-    },
-    {
-        "name": "Diazepam",
-        "description": "Treats anxiety and muscle spasms",
-        "dosage": "5mg 2-3 times daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Lorazepam",
-        "description": "Treats anxiety",
-        "dosage": "1mg 2-3 times daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Alprazolam",
-        "description": "Treats anxiety and panic disorders",
-        "dosage": "0.25mg 2-3 times daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Fluoxetine",
-        "description": "Treats depression and anxiety",
-        "dosage": "20mg once daily",
-        "type": "Capsule"
-    },
-    {
-        "name": "Sertraline",
-        "description": "Treats depression and anxiety",
-        "dosage": "50mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Citalopram",
-        "description": "Treats depression",
-        "dosage": "20mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Venlafaxine",
-        "description": "Treats depression and anxiety",
-        "dosage": "75mg once daily",
-        "type": "Capsule"
-    },
-    {
-        "name": "Amoxicillin-Clavulanate",
-        "description": "Antibiotic for bacterial infections",
-        "dosage": "875mg/125mg every 12 hours",
-        "type": "Tablet"
-    },
-    {
-        "name": "Doxycycline",
-        "description": "Antibiotic for bacterial infections",
-        "dosage": "100mg every 12 hours",
-        "type": "Capsule"
-    },
-    {
-        "name": "Clarithromycin",
-        "description": "Antibiotic for bacterial infections",
-        "dosage": "500mg every 12 hours",
-        "type": "Tablet"
-    },
-    {
-        "name": "Ranitidine",
-        "description": "Reduces stomach acid",
-        "dosage": "150mg twice daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Famotidine",
-        "description": "Reduces stomach acid",
-        "dosage": "20mg twice daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Pantoprazole",
-        "description": "Reduces stomach acid",
-        "dosage": "40mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Esomeprazole",
-        "description": "Reduces stomach acid",
-        "dosage": "20mg once daily",
-        "type": "Capsule"
-    },
-    {
-        "name": "Gliclazide",
-        "description": "Lowers blood sugar in type 2 diabetes",
-        "dosage": "80mg twice daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Glyburide",
-        "description": "Lowers blood sugar in type 2 diabetes",
-        "dosage": "5mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Sitagliptin",
-        "description": "Lowers blood sugar in type 2 diabetes",
-        "dosage": "100mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Canagliflozin",
-        "description": "Lowers blood sugar in type 2 diabetes",
-        "dosage": "100mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Rosuvastatin",
-        "description": "Lowers cholesterol levels",
-        "dosage": "10mg once daily",
-        "type": "Tablet"
-    },
-    {
-        "name": "Erythromycin",
-        "description": "Antibiotic for bacterial infections",
-        "dosage": "500mg every 6 hours",
-        "type": "Tablet"
-    },
-    {
-        "name": "Levofloxacin",
-        "description": "Antibiotic for bacterial infections",
-        "dosage": "500mg once daily",
-        "type": "Tablet"
-    }
+  {
+    "name": "Paracetamol",
+    "description": "Pain reliever and fever reducer",
+    "dosage": "500mg every 4-6 hours",
+    "type": "Tablet"
+  },
+  {
+    "name": "Ibuprofen",
+    "description": "Anti-inflammatory and pain reliever",
+    "dosage": "200mg every 6-8 hours",
+    "type": "Tablet"
+  },
+  {
+    "name": "Amoxicillin",
+    "description": "Antibiotic for bacterial infections",
+    "dosage": "500mg every 8 hours",
+    "type": "Capsule"
+  },
+  {
+    "name": "Metformin",
+    "description": "Controls high blood sugar in type 2 diabetes",
+    "dosage": "500mg twice daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Aspirin",
+    "description": "Pain reliever, reduces inflammation and fever",
+    "dosage": "300mg every 4-6 hours",
+    "type": "Tablet"
+  },
+  {
+    "name": "Ciprofloxacin",
+    "description": "Antibiotic for bacterial infections",
+    "dosage": "500mg every 12 hours",
+    "type": "Tablet"
+  },
+  {
+    "name": "Omeprazole",
+    "description": "Reduces stomach acid",
+    "dosage": "20mg once daily",
+    "type": "Capsule"
+  },
+  {
+    "name": "Azithromycin",
+    "description": "Antibiotic for bacterial infections",
+    "dosage": "500mg on day 1, then 250mg daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Loratadine",
+    "description": "Relieves allergy symptoms",
+    "dosage": "10mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Cetirizine",
+    "description": "Relieves allergy symptoms",
+    "dosage": "10mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Hydrochlorothiazide",
+    "description": "Treats high blood pressure and fluid retention",
+    "dosage": "25mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Amlodipine",
+    "description": "Treats high blood pressure and chest pain",
+    "dosage": "5mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Losartan",
+    "description": "Treats high blood pressure",
+    "dosage": "50mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Atorvastatin",
+    "description": "Lowers cholesterol levels",
+    "dosage": "10mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Simvastatin",
+    "description": "Lowers cholesterol",
+    "dosage": "20mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Levothyroxine",
+    "description": "Treats hypothyroidism",
+    "dosage": "50 mcg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Prednisone",
+    "description": "Reduces inflammation",
+    "dosage": "10mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Hydrocortisone Cream",
+    "description": "Relieves skin irritation and inflammation",
+    "dosage": "Apply thin layer 2-3 times daily",
+    "type": "Topical Cream"
+  },
+  {
+    "name": "Insulin Glargine",
+    "description": "Long-acting insulin for diabetes",
+    "dosage": "As prescribed, usually once daily",
+    "type": "Injection"
+  },
+  {
+    "name": "Insulin Aspart",
+    "description": "Rapid-acting insulin for diabetes",
+    "dosage": "As prescribed before meals",
+    "type": "Injection"
+  },
+  {
+    "name": "Salbutamol Inhaler",
+    "description": "Relieves asthma symptoms",
+    "dosage": "2 puffs every 4-6 hours as needed",
+    "type": "Inhaler"
+  },
+  {
+    "name": "Budesonide Inhaler",
+    "description": "Prevents asthma attacks",
+    "dosage": "1-2 inhalations twice daily",
+    "type": "Inhaler"
+  },
+  {
+    "name": "Montelukast",
+    "description": "Prevents asthma and allergy symptoms",
+    "dosage": "10mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Furosemide",
+    "description": "Diuretic for fluid retention",
+    "dosage": "40mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Spironolactone",
+    "description": "Treats high blood pressure and fluid buildup",
+    "dosage": "25mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Clopidogrel",
+    "description": "Prevents blood clots",
+    "dosage": "75mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Warfarin",
+    "description": "Prevents blood clots",
+    "dosage": "As prescribed based on INR",
+    "type": "Tablet"
+  },
+  {
+    "name": "Enoxaparin",
+    "description": "Prevents and treats blood clots",
+    "dosage": "40mg once daily",
+    "type": "Injection"
+  },
+  {
+    "name": "Diazepam",
+    "description": "Treats anxiety and muscle spasms",
+    "dosage": "5mg 2-3 times daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Lorazepam",
+    "description": "Treats anxiety",
+    "dosage": "1mg 2-3 times daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Alprazolam",
+    "description": "Treats anxiety and panic disorders",
+    "dosage": "0.25mg 2-3 times daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Fluoxetine",
+    "description": "Treats depression and anxiety",
+    "dosage": "20mg once daily",
+    "type": "Capsule"
+  },
+  {
+    "name": "Sertraline",
+    "description": "Treats depression and anxiety",
+    "dosage": "50mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Citalopram",
+    "description": "Treats depression",
+    "dosage": "20mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Venlafaxine",
+    "description": "Treats depression and anxiety",
+    "dosage": "75mg once daily",
+    "type": "Capsule"
+  },
+  {
+    "name": "Amoxicillin-Clavulanate",
+    "description": "Antibiotic for bacterial infections",
+    "dosage": "875mg/125mg every 12 hours",
+    "type": "Tablet"
+  },
+  {
+    "name": "Doxycycline",
+    "description": "Antibiotic for bacterial infections",
+    "dosage": "100mg every 12 hours",
+    "type": "Capsule"
+  },
+  {
+    "name": "Clarithromycin",
+    "description": "Antibiotic for bacterial infections",
+    "dosage": "500mg every 12 hours",
+    "type": "Tablet"
+  },
+  {
+    "name": "Ranitidine",
+    "description": "Reduces stomach acid",
+    "dosage": "150mg twice daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Famotidine",
+    "description": "Reduces stomach acid",
+    "dosage": "20mg twice daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Pantoprazole",
+    "description": "Reduces stomach acid",
+    "dosage": "40mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Esomeprazole",
+    "description": "Reduces stomach acid",
+    "dosage": "20mg once daily",
+    "type": "Capsule"
+  },
+  {
+    "name": "Gliclazide",
+    "description": "Lowers blood sugar in type 2 diabetes",
+    "dosage": "80mg twice daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Glyburide",
+    "description": "Lowers blood sugar in type 2 diabetes",
+    "dosage": "5mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Sitagliptin",
+    "description": "Lowers blood sugar in type 2 diabetes",
+    "dosage": "100mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Canagliflozin",
+    "description": "Lowers blood sugar in type 2 diabetes",
+    "dosage": "100mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Rosuvastatin",
+    "description": "Lowers cholesterol levels",
+    "dosage": "10mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Erythromycin",
+    "description": "Antibiotic for bacterial infections",
+    "dosage": "500mg every 6 hours",
+    "type": "Tablet"
+  },
+  {
+    "name": "Levofloxacin",
+    "description": "Antibiotic for bacterial infections",
+    "dosage": "500mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Atenolol",
+    "description": "Treats high blood pressure",
+    "dosage": "50mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Diclofenac",
+    "description": "Pain reliever, decreases inflammation",
+    "dosage": "25mg as needed",
+    "type": "Tablet"
+  },
+  {
+    "name": "Co-trimoxazole",
+    "description": "Antibiotic for bacterial infections",
+    "dosage": "as per prescription",
+    "type": "Suspension"
+  },
+  {
+    "name": "Glibenclamide",
+    "description": "Lowers blood sugar in diabetes",
+    "dosage": "5mg once daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Phenytoin",
+    "description": "Treats seizures",
+    "dosage": "100mg three times daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Carbamazepine",
+    "description": "Treats seizures and nerve pain",
+    "dosage": "200mg twice daily",
+    "type": "Tablet"
+  },
+  {
+    "name": "Acyclovir",
+    "description": "Antiviral for herpes infections",
+    "dosage": "200mg five times daily",
+    "type": "Tablet"
+  }
 ]
