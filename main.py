@@ -167,6 +167,36 @@ data_illness = {
     "acute": "Sudden and short-term illnesses."
 }
 
+
+popular_ilnesses = {
+    "Influenza (Flu)": "A contagious respiratory illness caused by influenza viruses, leading to fever, cough, sore throat, and body aches.",
+    "Common Cold": "A mild viral infection of the nose and throat, causing sneezing, runny nose, and sore throat.",
+    "COVID-19": "A respiratory illness caused by the SARS-CoV-2 virus, with symptoms ranging from mild cough to severe pneumonia.",
+    "Diabetes": "A chronic condition where the body either doesn't produce enough insulin or can't effectively use it, leading to high blood sugar.",
+    "Hypertension (High Blood Pressure)": "A condition where the force of blood against artery walls is consistently too high, increasing heart disease risk.",
+    "Asthma": "A chronic respiratory condition causing airway inflammation, difficulty breathing, wheezing, and coughing.",
+    "Tuberculosis (TB)": "A bacterial infection mainly affecting the lungs, spread through airborne particles from an infected person.",
+    "Malaria": "A mosquito-borne disease caused by Plasmodium parasites, leading to fever, chills, and flu-like symptoms.",
+    "HIV/AIDS": "A viral infection that attacks the immune system, weakening the body's defense against infections and certain cancers.",
+    "Cancer": "A group of diseases involving abnormal cell growth that can invade or spread to other parts of the body."
+}
+
+@bot.message_handler(func=lambda message:message.text.strip().lower() == "popular illnesses")
+def popular_ill(message):
+    markup_popular = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    markup_popular.add(*popular_ilnesses.keys(), "Back to Menu")
+    bot.send_message(message.chat.id, "Here are 10 popular illnesses. Choose a popular illness to get information", reply_markup=markup_popular)
+
+@bot.message_handler(func=lambda message: message.text and message.text.strip().lower() in [ill.lower() for ill in popular_ilnesses])
+def info_popular_ill(message):
+    user_choice = message.text.strip().lower()
+    for illness in popular_ilnesses:
+        if illness.lower() == user_choice:
+            bot.send_message(message.chat.id, f"{illness} Information: {popular_ilnesses[illness]}")
+            break
+
+
+
 @bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "types of illnesses")
 def types_illness(message):
     markup_type = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
@@ -232,7 +262,7 @@ def handle_messages(message):
 
     if mode == "menu":
         bot.send_message(message.chat.id, "Please choose an option from the menu.")
-        main_menu()
+        main_menu(message)
         
 
 if __name__ == "__main__":
