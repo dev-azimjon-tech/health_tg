@@ -119,5 +119,17 @@ class TestDrugs(unittest.TestCase):
         self.assertIn("reply_markup", called_kwargs)
         self.assertEqual(main.user_mode["123"], "drugs")
 
+
+class TestpopularIllness(unittest.TestCase):
+    @patch("main.bot.send_message")
+    def test_popular_illness(self, mock_send_message):
+        message = MagicMock()
+        message.chat.id = 55
+        main.popular_ill(message)
+        args, kwargs = mock_send_message.call_args
+        self.assertEqual(args[0], 55)
+        self.assertIn("Here are 10 popular illnesses. Choose a popular illness to get information", args[1])
+        self.assertIn("reply_markup", kwargs)
+
 if __name__ == "__main__":
     unittest.main()
