@@ -4,6 +4,7 @@ import json
 import os
 import google.generativeai as genai
 from dotenv import load_dotenv
+import time
 
 load_dotenv()
 
@@ -24,7 +25,6 @@ else:
 
 user_mode = {}
 
-
 def save_users():
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=2)
@@ -35,7 +35,6 @@ def is_authenticated(user_id):
 def load_drugs():
     with open(DRUGS_FILE, 'r') as f:
         return json.load(f)
-
 
 def main_menu(message):
     user_id = str(message.from_user.id)
@@ -50,7 +49,6 @@ def main_menu(message):
         types.KeyboardButton("Log Out")
     )
     bot.send_message(message.chat.id, "Main Menu:", reply_markup=markup_main)
-
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -115,7 +113,6 @@ def logout(message):
     markup.add("Register", "Log In")
     bot.send_message(message.chat.id, "You've been logged out.", reply_markup=markup)
 
-
 @bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "about this bot")
 def about_bot(message):
     markup_about = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
@@ -129,21 +126,17 @@ def about_bot(message):
         reply_markup=markup_about
     )
 
-
 @bot.message_handler(func=lambda message: message.text.lower() == "drugs")
 def drugs_info(message):
     user_id = str(message.from_user.id)
     user_mode[user_id] = "drugs"
-
     markup_drug = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
     markup_drug.add(types.KeyboardButton("Back to Menu"))
-
     bot.send_message(
         message.chat.id,
         "Drug Search Mode Activated.\nEnter the drug name (exact or partial).\nPress 'Back to Menu' to exit.",
         reply_markup=markup_drug
     )
-
 
 @bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "symptom checker")
 def symptom_checker(message):
@@ -157,7 +150,6 @@ def symptom_checker(message):
         reply_markup=markup
     )
 
-
 data_illness = {
     "infectious": "Infectious illnesses spread from person to person via germs.",
     "deficiency": "Caused by lack of essential nutrients.",
@@ -166,7 +158,6 @@ data_illness = {
     "chronic": "Long-lasting illnesses.",
     "acute": "Sudden and short-term illnesses."
 }
-
 
 popular_ilnesses = {
     "Influenza (Flu)": "A contagious respiratory illness caused by influenza viruses, leading to fever, cough, sore throat, and body aches.",
@@ -195,8 +186,6 @@ def info_popular_ill(message):
             bot.send_message(message.chat.id, f"{illness} Information: {popular_ilnesses[illness]}")
             break
 
-
-
 @bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "types of illnesses")
 def types_illness(message):
     markup_type = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
@@ -208,28 +197,19 @@ def info_type_ill(message):
     key = message.text.strip().lower()
     bot.send_message(message.chat.id, f"{key.capitalize()} Illness Info: {data_illness[key]}")
 
-
 @bot.message_handler(func=lambda message: True)
 def handle_messages(message):
     user_id = str(message.from_user.id)
-
-
     if not is_authenticated(user_id):
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         markup.add("Register", "Log In")
         bot.send_message(message.chat.id, "Please Register or Log In to use the bot.", reply_markup=markup)
         return
-
     text = message.text.strip().lower()
-
-
     if text == "back to menu":
         main_menu(message)
         return
-
     mode = user_mode.get(user_id, "menu")
-
-
     if mode == "drugs":
         drugs = load_drugs()
         found = False
@@ -247,23 +227,25 @@ def handle_messages(message):
         if not found:
             bot.send_message(message.chat.id, f"No drug like '{text}' found.")
         return
-
-
     if mode == "symptom_checker" and text != "back to menu":
-        bot.send_message(message.chat.id, "Analyzing your symptoms... Please wait.")
         try:
-            model = genai.GenerativeModel("gemini-2.5-flash")
-            response = model.generate_content(message.text.strip())
-            bot.send_message(message.chat.id, response.text)
+            bot.send_chat_action(message.chat.id, "typing")
+            bot.send_message(message.chat.id, "Analyzing your Symphtoms... Please Wait!")
+            model = genai.GenerativeModel("gemini-2.0-flash")
+            response = model.generate_content(message.text.strip(), stream=True)
+            final_text = ""
+            for chunk in response:
+                if chunk.candidates[0].content.parts:
+                    final_text += chunk.candidates[0].content.parts[0].text
+                    bot.send_chat_action(message.chat.id, "typing")
+                    time.sleep(0.5)
+            bot.send_message(message.chat.id, final_text)
         except Exception as e:
             bot.send_message(message.chat.id, f"AI error: {str(e)}")
         return
-
-
     if mode == "menu":
         bot.send_message(message.chat.id, "Please choose an option from the menu.")
         main_menu(message)
-        
 
 if __name__ == "__main__":
     print("Bot running....")
