@@ -1,22 +1,31 @@
-from telebot import types
-import telebot
-import json
 import os
+import json
+import time
+import telebot
+from flask import Flask, request
+from telebot import types
 import google.generativeai as genai
 from dotenv import load_dotenv
-import time
 
+# Загружаем переменные окружения из файла .env
 load_dotenv()
 
+# Настраиваем API ключи
 API_KEY = os.getenv("AI_API_KEY")
 TOKEN = os.getenv("TELEGRAM_TOKEN")
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")  # URL вашего развернутого приложения
+WEBHOOK_PORT = int(os.environ.get('PORT', 5000))
 
+# Инициализируем Flask и бота
+app = Flask(__name__)
 genai.configure(api_key=API_KEY)
 bot = telebot.TeleBot(TOKEN)
 
+# Файлы для хранения данных
 USERS_FILE = "user.json"
 DRUGS_FILE = "drugs.json"
 
+# Загрузка пользователей
 if os.path.exists(USERS_FILE):
     with open(USERS_FILE, "r") as f:
         users = json.load(f)
@@ -25,6 +34,7 @@ else:
 
 user_mode = {}
 
+# --- Функции сохранения и загрузки ---
 def save_users():
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=2)
@@ -50,6 +60,8 @@ def main_menu(message):
     )
     bot.send_message(message.chat.id, "Main Menu:", reply_markup=markup_main)
 
+# --- Обработчики команд и сообщений ---
+
 @bot.message_handler(commands=['start'])
 def start(message):
     user_id = str(message.from_user.id)
@@ -61,9 +73,14 @@ def start(message):
         bot.send_message(
             message.chat.id,
             "Hi! This bot lets you describe your symptoms to AI for possible solutions, "
-            "and explore information about illnesses and drugs."
+            "and explore information about illnesses and drugs.",
+            reply_markup=markup
         )
-        bot.send_message(message.chat.id, "Please Register or Log In to use the bot", reply_markup=markup)
+
+# (Остальные обработчики сообщений, которые вы уже написали,
+# переносятся сюда без изменений)
+# @bot.message_handler(func=...)
+# def ...
 
 @bot.message_handler(func=lambda m: m.text and m.text.strip().lower() == "register")
 def register(message):
@@ -136,18 +153,6 @@ def drugs_info(message):
         message.chat.id,
         "Drug Search Mode Activated.\nEnter the drug name (exact or partial).\nPress 'Back to Menu' to exit.",
         reply_markup=markup_drug
-    )
-
-@bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "symptom checker")
-def symptom_checker(message):
-    user_id = str(message.from_user.id)
-    user_mode[user_id] = "symptom_checker"
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(types.KeyboardButton("Back to Menu"))
-    bot.send_message(
-        message.chat.id,
-        "Symptom Checker Mode Activated.\nDescribe your symptoms.\nPress 'Back to Menu' to exit.",
-        reply_markup=markup
     )
 
 data_illness = {
@@ -246,10 +251,25 @@ def handle_messages(message):
     if mode == "menu":
         bot.send_message(message.chat.id, "Please choose an option from the menu.")
         main_menu(message)
+        
+# --- Код для вебхука ---
+@app.route('/', methods=['POST'])
+def webhook():
+    if request.headers.get('content-type') == 'application/json':
+        json_string = request.get_data().decode('utf-8')
+        update = telebot.types.Update.de_json(json_string)
+        bot.process_new_updates([update])
+        return 'ok', 200
+    else:
+        return 'bad request', 403
 
-if __name__ == "__main__":
-    print("Bot running....")
+# Основная точка входа
+if __name__ == '__main__':
+    # Устанавливаем вебхук при запуске
     bot.remove_webhook()
-    print("Webhook removed!")
-    bot.infinity_polling()
-   
+    time.sleep(1)
+    # WEBHOOK_URL - это URL вашего деплоя (например, https://my-awesome-bot.herokuapp.com/)
+    bot.set_webhook(url=WEBHOOK_URL)
+    print(f"Webhook set to: {WEBHOOK_URL}")
+    print(f"Flask app running on port {WEBHOOK_PORT}...")
+    app.run(host='0.0.0.0', port=WEBHOOK_PORT)
