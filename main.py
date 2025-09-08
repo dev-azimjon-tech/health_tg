@@ -176,5 +176,8 @@ def block_unauthorized(message):
         bot.send_message(message.chat.id, "Please Register or Log In to use the bot.", reply_markup=markup)
 
 
+def ads(message):
+    bot.send_message(message.chat.id, "Comming soon")
+
 bot.remove_webhook()
 bot.infinity_polling()
