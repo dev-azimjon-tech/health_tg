@@ -7,25 +7,30 @@ from telebot import types
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-# Загружаем переменные окружения из файла .env
+# Load environment variables
 load_dotenv()
 
-# Настраиваем API ключи
+# API keys
 API_KEY = os.getenv("AI_API_KEY")
 TOKEN = os.getenv("TELEGRAM_TOKEN")
-WEBHOOK_URL = os.getenv("WEBHOOK_URL")  # URL вашего развернутого приложения
-WEBHOOK_PORT = int(os.environ.get('PORT', 5000))
 
-# Инициализируем Flask и бота
-app = Flask(__name__)
+if not TOKEN:
+    raise ValueError("⚠️ TELEGRAM_TOKEN is not set in environment variables!")
+if not API_KEY:
+    raise ValueError("⚠️ AI_API_KEY is not set in environment variables!")
+
+# Configure Gemini AI
 genai.configure(api_key=API_KEY)
+
+# Init Flask + bot
+app = Flask(__name__)
 bot = telebot.TeleBot(TOKEN)
 
-# Файлы для хранения данных
+# Files for user + drugs
 USERS_FILE = "user.json"
 DRUGS_FILE = "drugs.json"
 
-# Загрузка пользователей
+# Load users
 if os.path.exists(USERS_FILE):
     with open(USERS_FILE, "r") as f:
         users = json.load(f)
@@ -34,7 +39,7 @@ else:
 
 user_mode = {}
 
-# --- Функции сохранения и загрузки ---
+# --- Helpers ---
 def save_users():
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=2)
@@ -43,8 +48,10 @@ def is_authenticated(user_id):
     return str(user_id) in users
 
 def load_drugs():
-    with open(DRUGS_FILE, 'r') as f:
-        return json.load(f)
+    if os.path.exists(DRUGS_FILE):
+        with open(DRUGS_FILE, "r") as f:
+            return json.load(f)
+    return []
 
 def main_menu(message):
     user_id = str(message.from_user.id)
@@ -60,9 +67,9 @@ def main_menu(message):
     )
     bot.send_message(message.chat.id, "Main Menu:", reply_markup=markup_main)
 
-# --- Обработчики команд и сообщений ---
+# --- Bot Handlers ---
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=["start"])
 def start(message):
     user_id = str(message.from_user.id)
     if is_authenticated(user_id):
@@ -76,11 +83,6 @@ def start(message):
             "and explore information about illnesses and drugs.",
             reply_markup=markup
         )
-
-# (Остальные обработчики сообщений, которые вы уже написали,
-# переносятся сюда без изменений)
-# @bot.message_handler(func=...)
-# def ...
 
 @bot.message_handler(func=lambda m: m.text and m.text.strip().lower() == "register")
 def register(message):
@@ -177,7 +179,7 @@ popular_ilnesses = {
     "Cancer": "A group of diseases involving abnormal cell growth that can invade or spread to other parts of the body."
 }
 
-@bot.message_handler(func=lambda message:message.text.strip().lower() == "popular illnesses")
+@bot.message_handler(func=lambda message: message.text.strip().lower() == "popular illnesses")
 def popular_ill(message):
     markup_popular = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     markup_popular.add(*popular_ilnesses.keys(), "Back to Menu")
@@ -235,7 +237,7 @@ def handle_messages(message):
     if mode == "symptom_checker" and text != "back to menu":
         try:
             bot.send_chat_action(message.chat.id, "typing")
-            bot.send_message(message.chat.id, "Analyzing your Symphtoms... Please Wait!")
+            bot.send_message(message.chat.id, "Analyzing your symptoms... Please Wait!")
             model = genai.GenerativeModel("gemini-2.0-flash")
             response = model.generate_content(message.text.strip(), stream=True)
             final_text = ""
@@ -251,25 +253,32 @@ def handle_messages(message):
     if mode == "menu":
         bot.send_message(message.chat.id, "Please choose an option from the menu.")
         main_menu(message)
-        
-# --- Код для вебхука ---
-@app.route('/', methods=['POST'])
+
+# --- Webhook Setup ---
+
+WEBHOOK_PATH = f"/webhook/{TOKEN}"
+WEBHOOK_URL = f"https://symphtom-checker.onrender.com{WEBHOOK_PATH}"
+
+@app.route("/", methods=["GET"])
+def index():
+    return "Bot is running on Render 🚀", 200
+
+@app.route(WEBHOOK_PATH, methods=["POST"])
 def webhook():
-    if request.headers.get('content-type') == 'application/json':
-        json_string = request.get_data().decode('utf-8')
+    if request.headers.get("content-type") == "application/json":
+        json_string = request.get_data().decode("utf-8")
         update = telebot.types.Update.de_json(json_string)
         bot.process_new_updates([update])
-        return 'ok', 200
+        return "ok", 200
     else:
-        return 'bad request', 403
+        return "bad request", 403
 
-# Основная точка входа
-if __name__ == '__main__':
-    # Устанавливаем вебхук при запуске
+# --- Entrypoint ---
+if __name__ == "__main__":
     bot.remove_webhook()
     time.sleep(1)
-    # WEBHOOK_URL - это URL вашего деплоя (например, https://my-awesome-bot.herokuapp.com/)
     bot.set_webhook(url=WEBHOOK_URL)
-    print(f"Webhook set to: {WEBHOOK_URL}")
-    print(f"Flask app running on port {WEBHOOK_PORT}...")
-    app.run(host='0.0.0.0', port=WEBHOOK_PORT)
+    print(f"✅ Webhook set to: {WEBHOOK_URL}")
+    port = int(os.environ.get("PORT", 10000))
+    print(f"🌍 Flask app running on port {port}...")
+    app.run(host="0.0.0.0", port=port)
