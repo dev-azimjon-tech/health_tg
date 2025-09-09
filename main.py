@@ -7,30 +7,24 @@ from telebot import types
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
-# API keys
 API_KEY = os.getenv("AI_API_KEY")
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 if not TOKEN:
-    raise ValueError("⚠️ TELEGRAM_TOKEN is not set in environment variables!")
+    raise ValueError("TELEGRAM_TOKEN is not set in environment variables!")
 if not API_KEY:
-    raise ValueError("⚠️ AI_API_KEY is not set in environment variables!")
+    raise ValueError("AI_API_KEY is not set in environment variables!")
 
-# Configure Gemini AI
 genai.configure(api_key=API_KEY)
 
-# Init Flask + bot
 app = Flask(__name__)
 bot = telebot.TeleBot(TOKEN)
 
-# Files for user + drugs
 USERS_FILE = "user.json"
 DRUGS_FILE = "drugs.json"
 
-# Load users
 if os.path.exists(USERS_FILE):
     with open(USERS_FILE, "r") as f:
         users = json.load(f)
@@ -39,7 +33,6 @@ else:
 
 user_mode = {}
 
-# --- Helpers ---
 def save_users():
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=2)
@@ -66,8 +59,6 @@ def main_menu(message):
         types.KeyboardButton("Log Out")
     )
     bot.send_message(message.chat.id, "Main Menu:", reply_markup=markup_main)
-
-# --- Bot Handlers ---
 
 @bot.message_handler(commands=["start"])
 def start(message):
@@ -127,7 +118,6 @@ def logout(message):
     if user_id in users:
         del users[user_id]
         save_users()
-        print(f"{user_id} logged out.")
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add("Register", "Log In")
     bot.send_message(message.chat.id, "You've been logged out.", reply_markup=markup)
@@ -239,13 +229,8 @@ def handle_messages(message):
             bot.send_chat_action(message.chat.id, "typing")
             bot.send_message(message.chat.id, "Analyzing your symptoms... Please Wait!")
             model = genai.GenerativeModel("gemini-2.0-flash")
-            response = model.generate_content(message.text.strip(), stream=True)
-            final_text = ""
-            for chunk in response:
-                if chunk.candidates[0].content.parts:
-                    final_text += chunk.candidates[0].content.parts[0].text
-                    bot.send_chat_action(message.chat.id, "typing")
-                    time.sleep(0.5)
+            response = model.generate_content(message.text.strip())
+            final_text = response.text if hasattr(response, "text") else "Sorry, I could not analyze your symptoms."
             bot.send_message(message.chat.id, final_text)
         except Exception as e:
             bot.send_message(message.chat.id, f"AI error: {str(e)}")
@@ -253,8 +238,6 @@ def handle_messages(message):
     if mode == "menu":
         bot.send_message(message.chat.id, "Please choose an option from the menu.")
         main_menu(message)
-
-# --- Webhook Setup ---
 
 WEBHOOK_PATH = f"/webhook/{TOKEN}"
 WEBHOOK_URL = f"https://symphtom-checker.onrender.com{WEBHOOK_PATH}"
@@ -273,12 +256,9 @@ def webhook():
     else:
         return "bad request", 403
 
-# --- Entrypoint ---
 if __name__ == "__main__":
     bot.remove_webhook()
     time.sleep(1)
     bot.set_webhook(url=WEBHOOK_URL)
-    print(f"✅ Webhook set to: {WEBHOOK_URL}")
     port = int(os.environ.get("PORT", 10000))
-    print(f"🌍 Flask app running on port {port}...")
     app.run(host="0.0.0.0", port=port)
