@@ -256,6 +256,8 @@ def webhook():
     else:
         return "bad request", 403
 
+def ads(message):
+    bot.send_message(message.chat.id, "Ads is comming soon ....")
 if __name__ == "__main__":
     bot.remove_webhook()
     time.sleep(1)
