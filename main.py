@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import re
 import telebot
 from flask import Flask, request
 from telebot import types
@@ -75,6 +76,7 @@ def start(message):
             reply_markup=markup
         )
 
+# -------- Registration with validation --------
 @bot.message_handler(func=lambda m: m.text and m.text.strip().lower() == "register")
 def register(message):
     user_id = str(message.from_user.id)
@@ -82,27 +84,41 @@ def register(message):
         bot.send_message(message.chat.id, "You're already registered.")
         main_menu(message)
         return
-    msg = bot.send_message(message.chat.id, "Enter your name:")
+    msg = bot.send_message(message.chat.id, "Enter your name (at least 3 letters):")
     bot.register_next_step_handler(msg, process_register_name)
 
 def process_register_name(message):
     name = message.text.strip()
     user_id = str(message.from_user.id)
+    if len(name) < 3 or not name.isalpha():
+        msg = bot.send_message(message.chat.id, "❌ Invalid name. Please enter at least 3 letters (letters only).")
+        bot.register_next_step_handler(msg, process_register_name)
+        return
     users[user_id] = {"name": name}
-    msg = bot.send_message(message.chat.id, "Now enter your phone number:")
+    msg = bot.send_message(message.chat.id, "Now enter your phone number (format +992XXXXXXXXX):")
     bot.register_next_step_handler(msg, process_register_phone)
 
 def process_register_phone(message):
     phone = message.text.strip()
     user_id = str(message.from_user.id)
+
+    if not re.fullmatch(r"\+992\d{9}$", phone):
+        msg = bot.send_message(message.chat.id, "❌ Invalid phone. Please use format +992XXXXXXXXX (9 digits).")
+        bot.register_next_step_handler(msg, process_register_phone)
+        return
+
     if user_id in users:
         users[user_id]["phone"] = phone
         save_users()
-        bot.send_message(message.chat.id, f"Registration complete!\nName: {users[user_id]['name']}\nPhone: {phone}")
+        bot.send_message(
+            message.chat.id,
+            f"✅ Registration complete!\nName: {users[user_id]['name']}\nPhone: {phone}"
+        )
         main_menu(message)
     else:
         bot.send_message(message.chat.id, "Something went wrong. Please type 'register' again.")
 
+# -------- Login / Logout --------
 @bot.message_handler(func=lambda m: m.text and m.text.strip().lower() == "log in")
 def login(message):
     user_id = str(message.from_user.id)
@@ -122,6 +138,7 @@ def logout(message):
     markup.add("Register", "Log In")
     bot.send_message(message.chat.id, "You've been logged out.", reply_markup=markup)
 
+# -------- About --------
 @bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "about this bot")
 def about_bot(message):
     markup_about = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
@@ -135,6 +152,22 @@ def about_bot(message):
         reply_markup=markup_about
     )
 
+# -------- Symptom Checker --------
+@bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "symptom checker")
+def symptom_checker(message):
+    user_id = str(message.from_user.id)
+    user_mode[user_id] = "symptom_checker"
+    markup_symptom = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+    markup_symptom.add(types.KeyboardButton("Back to Menu"))
+    bot.send_message(
+        message.chat.id,
+        "🩺 Symptom Checker Activated.\n"
+        "Please describe your symptoms in detail.\n"
+        "Press 'Back to Menu' to exit.",
+        reply_markup=markup_symptom
+    )
+
+# -------- Drugs --------
 @bot.message_handler(func=lambda message: message.text.lower() == "drugs")
 def drugs_info(message):
     user_id = str(message.from_user.id)
@@ -147,6 +180,7 @@ def drugs_info(message):
         reply_markup=markup_drug
     )
 
+# -------- Illnesses --------
 data_illness = {
     "infectious": "Infectious illnesses spread from person to person via germs.",
     "deficiency": "Caused by lack of essential nutrients.",
@@ -194,6 +228,7 @@ def info_type_ill(message):
     key = message.text.strip().lower()
     bot.send_message(message.chat.id, f"{key.capitalize()} Illness Info: {data_illness[key]}")
 
+# -------- General Message Handler --------
 @bot.message_handler(func=lambda message: True)
 def handle_messages(message):
     user_id = str(message.from_user.id)
@@ -239,6 +274,7 @@ def handle_messages(message):
         bot.send_message(message.chat.id, "Please choose an option from the menu.")
         main_menu(message)
 
+# -------- Webhook --------
 WEBHOOK_PATH = f"/webhook/{TOKEN}"
 WEBHOOK_URL = f"https://symphtom-checker.onrender.com{WEBHOOK_PATH}"
 
@@ -256,8 +292,11 @@ def webhook():
     else:
         return "bad request", 403
 
+# -------- Ads --------
 def ads(message):
-    bot.send_message(message.chat.id, "Ads is comming soon ....")
+    bot.send_message(message.chat.id, "Ads is coming soon ....")
+
+# -------- Main --------
 if __name__ == "__main__":
     bot.remove_webhook()
     time.sleep(1)
