@@ -23,7 +23,7 @@ genai.configure(api_key=API_KEY)
 app = Flask(__name__)
 bot = telebot.TeleBot(TOKEN)
 
-USERS_FILE = "user.json"
+USERS_FILE = "/tmp/users.json"
 DRUGS_FILE = "drugs.json"
 
 if os.path.exists(USERS_FILE):
@@ -76,7 +76,7 @@ def start(message):
             reply_markup=markup
         )
 
-# -------- Registration with validation --------
+
 @bot.message_handler(func=lambda m: m.text and m.text.strip().lower() == "register")
 def register(message):
     user_id = str(message.from_user.id)
@@ -118,7 +118,7 @@ def process_register_phone(message):
     else:
         bot.send_message(message.chat.id, "Something went wrong. Please type 'register' again.")
 
-# -------- Login / Logout --------
+
 @bot.message_handler(func=lambda m: m.text and m.text.strip().lower() == "log in")
 def login(message):
     user_id = str(message.from_user.id)
@@ -138,7 +138,6 @@ def logout(message):
     markup.add("Register", "Log In")
     bot.send_message(message.chat.id, "You've been logged out.", reply_markup=markup)
 
-# -------- About --------
 @bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "about this bot")
 def about_bot(message):
     markup_about = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
@@ -152,7 +151,7 @@ def about_bot(message):
         reply_markup=markup_about
     )
 
-# -------- Symptom Checker --------
+
 @bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "symptom checker")
 def symptom_checker(message):
     user_id = str(message.from_user.id)
@@ -167,7 +166,7 @@ def symptom_checker(message):
         reply_markup=markup_symptom
     )
 
-# -------- Drugs --------
+
 @bot.message_handler(func=lambda message: message.text.lower() == "drugs")
 def drugs_info(message):
     user_id = str(message.from_user.id)
@@ -180,7 +179,7 @@ def drugs_info(message):
         reply_markup=markup_drug
     )
 
-# -------- Illnesses --------
+
 data_illness = {
     "infectious": "Infectious illnesses spread from person to person via germs.",
     "deficiency": "Caused by lack of essential nutrients.",
@@ -228,7 +227,7 @@ def info_type_ill(message):
     key = message.text.strip().lower()
     bot.send_message(message.chat.id, f"{key.capitalize()} Illness Info: {data_illness[key]}")
 
-# -------- General Message Handler --------
+
 @bot.message_handler(func=lambda message: True)
 def handle_messages(message):
     user_id = str(message.from_user.id)
@@ -274,7 +273,7 @@ def handle_messages(message):
         bot.send_message(message.chat.id, "Please choose an option from the menu.")
         main_menu(message)
 
-# -------- Webhook --------
+
 WEBHOOK_PATH = f"/webhook/{TOKEN}"
 WEBHOOK_URL = f"https://symphtom-checker.onrender.com{WEBHOOK_PATH}"
 
@@ -292,11 +291,10 @@ def webhook():
     else:
         return "bad request", 403
 
-# -------- Ads --------
 def ads(message):
     bot.send_message(message.chat.id, "Ads is coming soon ....")
 
-# -------- Main --------
+
 if __name__ == "__main__":
     bot.remove_webhook()
     time.sleep(1)
