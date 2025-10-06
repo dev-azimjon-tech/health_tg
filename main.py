@@ -76,7 +76,6 @@ def start(message):
             reply_markup=markup
         )
 
-
 @bot.message_handler(func=lambda m: m.text and m.text.strip().lower() == "register")
 def register(message):
     user_id = str(message.from_user.id)
@@ -101,12 +100,10 @@ def process_register_name(message):
 def process_register_phone(message):
     phone = message.text.strip()
     user_id = str(message.from_user.id)
-
     if not re.fullmatch(r"\+992\d{9}$", phone):
         msg = bot.send_message(message.chat.id, "❌ Invalid phone. Please use format +992XXXXXXXXX (9 digits).")
         bot.register_next_step_handler(msg, process_register_phone)
         return
-
     if user_id in users:
         users[user_id]["phone"] = phone
         save_users()
@@ -117,7 +114,6 @@ def process_register_phone(message):
         main_menu(message)
     else:
         bot.send_message(message.chat.id, "Something went wrong. Please type 'register' again.")
-
 
 @bot.message_handler(func=lambda m: m.text and m.text.strip().lower() == "log in")
 def login(message):
@@ -151,7 +147,6 @@ def about_bot(message):
         reply_markup=markup_about
     )
 
-
 @bot.message_handler(func=lambda message: message.text and message.text.strip().lower() == "symptom checker")
 def symptom_checker(message):
     user_id = str(message.from_user.id)
@@ -166,7 +161,6 @@ def symptom_checker(message):
         reply_markup=markup_symptom
     )
 
-
 @bot.message_handler(func=lambda message: message.text.lower() == "drugs")
 def drugs_info(message):
     user_id = str(message.from_user.id)
@@ -178,7 +172,6 @@ def drugs_info(message):
         "Drug Search Mode Activated.\nEnter the drug name (exact or partial).\nPress 'Back to Menu' to exit.",
         reply_markup=markup_drug
     )
-
 
 data_illness = {
     "infectious": "Infectious illnesses spread from person to person via germs.",
@@ -227,7 +220,6 @@ def info_type_ill(message):
     key = message.text.strip().lower()
     bot.send_message(message.chat.id, f"{key.capitalize()} Illness Info: {data_illness[key]}")
 
-
 @bot.message_handler(func=lambda message: True)
 def handle_messages(message):
     user_id = str(message.from_user.id)
@@ -238,6 +230,7 @@ def handle_messages(message):
         return
     text = message.text.strip().lower()
     if text == "back to menu":
+        user_mode[user_id] = "menu"
         main_menu(message)
         return
     mode = user_mode.get(user_id, "menu")
@@ -273,7 +266,6 @@ def handle_messages(message):
         bot.send_message(message.chat.id, "Please choose an option from the menu.")
         main_menu(message)
 
-
 WEBHOOK_PATH = f"/webhook/{TOKEN}"
 WEBHOOK_URL = f"https://symphtom-checker.onrender.com{WEBHOOK_PATH}"
 
@@ -293,7 +285,6 @@ def webhook():
 
 def ads(message):
     bot.send_message(message.chat.id, "Ads is coming soon ....")
-
 
 if __name__ == "__main__":
     bot.remove_webhook()
